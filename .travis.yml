@@ -1,0 +1,25 @@
+language: node_js
+node_js: 8
+script: npm test
+before_deploy:
+- node_modules/.bin/babel src --out-dir lib
+- node_modules/.bin/gulp build
+deploy:
+- provider: npm
+  email: hi@molovo.co
+  skip_cleanup: true
+  api_key:
+    secure: JJOHkd+zuy4qL+ACnj3UNK8VHqXykbyWzAi9qFPGPvVIT0Z08XRiT5ZMYxqbzOKfy57ynj/x6s3EZQiX+D45Wqdm36254b5oNEkG8p+yHPqRYXn2+F05TaEMgGO9kgBxeczxG6Y7MsZt456sN2pK+4dGeLLrGLFjNjHlR4FrVYY3RUluyvdmjqS6NrFgCXKtxKYuG63jDbWmogKC1XDxBMId3aloojPglezsiLoJsxoObQWA2ASdc0Qar6IkirrTWp2lFI3aGx3jhDUn1W280withwdNVKWy8L3k/oDPAaDyYqFeBu5KfGOrRDI9osTA8gNYF+suCEdT4NqjUk4OEQvGtot5xLAq0FUtT7VEwccp/lVBxXdAIN4rBd0SjO26K/32unB5LdS1/Vm69h0coocjukAZ9eHEfg/n8qGP+0nppzQYSsoIPHEkGiWdgfvDFQFTxkgKtfFEAjq2zRi74L1i2MVe+SfAAQU28dKe3hA1bOlc+2ku9pRUVtYdkZcfOfureznTH1qE5uENMZTJUnfZZXXAJCy/lgZq9m2KsALzuJpYN34uQZ8BZOMMcz4i7lb8+JYChafkD2g9N7zTv5ECuQGdYYptoxlfnKsmDgmrYaejY82blTlj+zwRKuSMYxi0wBBAA7OggwXQl6LiKhvKTi6Cgolk+nuyvx48j8o=
+  on:
+    tags: true
+    repo: molovo/live-node-list
+- provider: releases
+  file:
+  - dist/live-node-list.js
+  - dist/live-node-list.min.js
+  skip_cleanup: true
+  api_key:
+    secure: CtkitZUJSEN2UWpKHr4Y/6z5IVtn+gkqClpEYJ9rgfE5bfWAJ4Zvd44LRztc5C4i8Hy/skiG1vi3Atad2iiOTW7Qyrg5ZSvquwpaypnPn2wTnG3smQBIPifrT/XZRKDtF+n1FnSrl/qqJMCu8Xkdi6/T2GbfzCZLSLROiHT70yCkdZLXfPWSF86QHhSWdMAuSe+OtSj3pqj+0GeSOt+T4VaTp15ZG4rl4e3s+eSO/yzxN0xJnO4Nj5Cg6hjnlAyjr2vkJgqzOf+SAhM6lU3NYRbD16dN/uxR7ndKSmsT2hzLiYD1IvbDWBgKZMMnD7glmRTzeNUdtpAGF907rdtYGYOegVjZoESbnZ6VoYpGwgRQq6ioaQ+SYKltwYBLJMYNaN9a6PMX4W4PqGREVF41q+Lg0GBdJdvnL4EIlJR+qIcG2dQcaPkdK2+/LMTXuCKTSNrv5nIB69awW4MMtx8zUYTUSVE+613KhTWI6oClXPx4bqxDj7f/d7SsQFKKln6+V1pZBiJNsjqQsv+HT5ghrbOAS8JMdkQcybCijilOZb8wQDWMwZdsRy2WDxDzRPdCRqOebiC4U+4xcV85pZl6bkHdDOrFi1TahQMLh3DZQcNCkmsvYctQTKPHZhPOzUYAsq0ZK0zc0845tRmkqvX0H6zgoI6hCy7+b/tSBDzw1+w=
+  on:
+    tags: true
+    repo: molovo/live-node-list
