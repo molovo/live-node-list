@@ -2,7 +2,7 @@
   "name": "live-node-list",
   "version": "1.0.0",
   "description": "An alternative to NodeList which keeps collections up to date when changes to the DOM occur",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": "git@github.com:molovo/live-node-list.git",
   "author": "James Dinsdale <hi@molovo.co>",
   "license": "MIT",
