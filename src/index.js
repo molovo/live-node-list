@@ -242,10 +242,7 @@ class LiveNodeList {
   @bind
   registerDOMObserver () {
     this.observer = new MutationObserver(this.refresh)
-    this.observer.observe(this.parent, {
-      childList: true,
-      subtree: true
-    })
+    this.resume()
   }
 
   /**
@@ -259,6 +256,25 @@ class LiveNodeList {
    */
   diffNodeList (a, b) {
     return Array.prototype.filter.call(a, item => Array.prototype.includes.call(b, item))
+  }
+
+  /**
+   * Pause observation of the list's parent
+   */
+  @bind
+  pause () {
+    this.observer.disconnect()
+  }
+
+  /**
+   * Resume observation of the list's parent
+   */
+  @bind
+  resume () {
+    this.observer.observe(this.parent, {
+      childList: true,
+      subtree: true
+    })
   }
 }
 
