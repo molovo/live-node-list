@@ -103,11 +103,13 @@ export default class LiveElement extends Observable {
     const current = this.item
     const selected = this.parent.querySelector(this.selector)
 
-    this.detachEventListeners(current)
-    this.attachEventListeners(selected)
+    if (current !== selected) {
+      this.detachEventListeners(current)
+      this.attachEventListeners(selected)
 
-    this.events.update.forEach(callback => callback(selected, current))
+      this.events.update.forEach(callback => callback(selected, current))
 
-    this.item = selected
+      this.item = selected
+    }
   }
 }
