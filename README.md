@@ -52,7 +52,7 @@ items.on('update', (newItems, oldItems) => {
 })
 ```
 
-If your update method triggers HTML changes within the parent, you can get caught in an infinite loop, where those changes trigger the update function recursively. If this happens, you can pause and resume LiveNodeLists observation to prevent recursive calls.
+If your update method triggers HTML changes within the parent, you can get caught in an infinite loop, where those changes trigger the update function recursively. If this happens, you can pause and resume LiveNodeList's observation to prevent recursive calls while you make the necessary updates.
 
 ```js
 const items = new LiveNodeList('.item')
