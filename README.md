@@ -12,7 +12,7 @@ npm install live-node-list
 ## Usage
 
 Use the LiveNodeList constructor anywhere you would normally use
-`document.querySelectorAll()`.
+`Element.querySelectorAll()`.
 
 ```js
 const items = new LiveNodeList('.item')
