@@ -1,5 +1,5 @@
 import { bind } from 'decko'
-import { Observable } from './observable'
+import Observable from './observable'
 
 export default class LiveNodeList extends Observable {
   /**
