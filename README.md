@@ -66,3 +66,18 @@ items.on('update', (newItems, oldItems) => {
   items.resume()
 })
 ```
+
+## LiveElement
+
+LiveNodeList also comes with a `LiveElement` class, which is used to attach a single element, and is useful as a replacement for `document.getElementById` which provides the same API.
+
+```js
+import { LiveElement } from 'live-node-list'
+
+const item = new LiveElement('#item')
+item.addEventListener('change', fn)
+
+item.on('update', (newItem, oldItem) => {
+  // Do something
+})
+```
