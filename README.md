@@ -43,7 +43,7 @@ items.removeEventListener('click', fn)
 ```
 
 LiveNodeList also triggers its own `update` event when the list of items
-changes. The list of supported events may grow in future.
+changes.
 
 ```js
 const items = new LiveNodeList('.item')
@@ -51,6 +51,17 @@ items.on('update', (newItems, oldItems) => {
   // Do something
 })
 ```
+
+The other supported events are as follows:
+
+* `start` - fired when observation first begins
+* `pause` - fired when the `pause()` method is called
+* `resume` - fired when the `resume()` method is called
+* `eventListeners:add` - fired when an event listener is added to the list
+* `eventListeners:remove` - fired when an event listener is removed from the list
+* `eventListeners:attach` - fired when the stored event listeners are attached
+* `eventListeners:detach` - fired when the stored event listeners are detached
+* `eventListeners:purge` - fired when the list of event listeners is purged
 
 If your update method triggers HTML changes within the parent, you can get caught in an infinite loop, where those changes trigger the update function recursively. If this happens, you can pause and resume LiveNodeList's observation to prevent recursive calls while you make the necessary updates.
 
