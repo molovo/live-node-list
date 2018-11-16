@@ -112,10 +112,14 @@ export default class Observable {
   registerDOMObserver () {
     this.observer = new MutationObserver(this.refresh)
 
-    this.observer.observe(this.parent, {
-      childList: true,
-      subtree: true
-    })
+    if (this.parent) {
+      this.observer.observe(this.parent, {
+        attributes: false,
+        characterData: false,
+        childList: true,
+        subtree: true
+      })
+    }
 
     this.events.start.forEach(callback => callback())
   }
@@ -135,10 +139,14 @@ export default class Observable {
    */
   @bind
   resume () {
-    this.observer.observe(this.parent, {
-      childList: true,
-      subtree: true
-    })
+    if (this.parent) {
+      this.observer.observe(this.parent, {
+        attributes: false,
+        characterData: false,
+        childList: true,
+        subtree: true
+      })
+    }
 
     this.events.resume.forEach(callback => callback())
   }

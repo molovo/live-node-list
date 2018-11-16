@@ -154,7 +154,7 @@ export default class LiveNodeList extends Observable {
     const newItems = this.diffNodeList(selected, current)
     const oldItems = this.diffNodeList(current, selected)
 
-    if (newItems.length > 0 || oldItems.length > 0) {
+    if ((newItems.length > 0) || (oldItems.length > 0)) {
       this.detachEventListeners(oldItems)
       this.attachEventListeners(newItems)
 
@@ -174,6 +174,6 @@ export default class LiveNodeList extends Observable {
    * @return {Array}
    */
   diffNodeList (a, b) {
-    return Array.prototype.filter.call(a, item => Array.prototype.includes.call(b, item))
+    return Array.prototype.filter.call(a, item => !Array.prototype.includes.call(b, item))
   }
 }
