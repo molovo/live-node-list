@@ -28,7 +28,15 @@ export default class Observable {
    * @type {object}
    */
   events = {
-    update: []
+    update: [],
+    start: [],
+    pause: [],
+    resume: [],
+    'eventListeners:add': [],
+    'eventListeners:remove': [],
+    'eventListeners:attach': [],
+    'eventListeners:detach': [],
+    'eventListeners:purge': []
   }
 
   /**
@@ -92,6 +100,8 @@ export default class Observable {
   purgeEventListeners () {
     this.detachEventListeners()
     this.eventListeners = {}
+
+    this.events['eventListeners:purge'].forEach(callback => callback())
   }
 
   /**
@@ -101,7 +111,13 @@ export default class Observable {
   @bind
   registerDOMObserver () {
     this.observer = new MutationObserver(this.refresh)
-    this.resume()
+
+    this.observer.observe(this.parent, {
+      childList: true,
+      subtree: true
+    })
+
+    this.events.start.forEach(callback => callback())
   }
 
   /**
@@ -110,6 +126,8 @@ export default class Observable {
   @bind
   pause () {
     this.observer.disconnect()
+
+    this.events.pause.forEach(callback => callback())
   }
 
   /**
@@ -121,5 +139,7 @@ export default class Observable {
       childList: true,
       subtree: true
     })
+
+    this.events.resume.forEach(callback => callback())
   }
 }

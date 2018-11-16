@@ -39,6 +39,8 @@ export default class LiveElement extends Observable {
     this.eventListeners[event].push(callback)
 
     this.item.addEventListener(event, callback)
+
+    this.events['eventListeners:add'].forEach(callback => callback())
   }
 
   /**
@@ -57,6 +59,8 @@ export default class LiveElement extends Observable {
     }
 
     this.item.removeEventListener(event, callback)
+
+    this.events['eventListeners:remove'].forEach(callback => callback())
   }
 
   /**
@@ -75,6 +79,8 @@ export default class LiveElement extends Observable {
         item.addEventListener(event, callback)
       })
     })
+
+    this.events['eventListeners:attach'].forEach(callback => callback())
   }
 
   /**
@@ -93,6 +99,8 @@ export default class LiveElement extends Observable {
         item.removeEventListener(event, callback)
       })
     })
+
+    this.events['eventListeners:detach'].forEach(callback => callback())
   }
 
   /**
