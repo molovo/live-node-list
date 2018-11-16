@@ -146,12 +146,14 @@ export default class LiveNodeList extends Observable {
     const newItems = this.diffNodeList(selected, current)
     const oldItems = this.diffNodeList(current, selected)
 
-    this.detachEventListeners(oldItems)
-    this.attachEventListeners(newItems)
+    if (newItems.length > 0 || oldItems.length > 0) {
+      this.detachEventListeners(oldItems)
+      this.attachEventListeners(newItems)
 
-    this.events.update.forEach(callback => callback(newItems, oldItems))
+      this.events.update.forEach(callback => callback(newItems, oldItems))
 
-    this.items = selected
+      this.items = selected
+    }
   }
 
   /**
