@@ -149,5 +149,9 @@ export default class Observable {
     }
 
     this.events.resume.forEach(callback => callback())
+
+    // Since observation had been disabled, force a refresh now to ensure the
+    // list is up to date
+    this.refresh()
   }
 }
