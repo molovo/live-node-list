@@ -115,9 +115,9 @@ export default class LiveElement extends Observable {
       this.detachEventListeners(current)
       this.attachEventListeners(selected)
 
-      this.events.update.forEach(callback => callback(selected, current))
-
       this.item = selected
+
+      this.events.update.forEach(callback => callback(selected, current))
     }
   }
 }

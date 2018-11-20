@@ -158,9 +158,9 @@ export default class LiveNodeList extends Observable {
       this.detachEventListeners(oldItems)
       this.attachEventListeners(newItems)
 
-      this.events.update.forEach(callback => callback(newItems, oldItems))
-
       this.items = selected
+
+      this.events.update.forEach(callback => callback(newItems, oldItems))
     }
   }
 
