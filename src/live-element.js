@@ -70,6 +70,10 @@ export default class LiveElement extends Observable {
    */
   @bind
   attachEventListeners (item = this.item) {
+    if (!item) {
+      return
+    }
+
     if (!(item instanceof Element)) {
       throw new TypeError('item must be an instance of Element')
     }
@@ -90,6 +94,10 @@ export default class LiveElement extends Observable {
    */
   @bind
   detachEventListeners (item = this.item) {
+    if (!item) {
+      return
+    }
+
     if (!(item instanceof Element)) {
       throw new TypeError('item must be an instance of Element')
     }
