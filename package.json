@@ -1,6 +1,6 @@
 {
   "name": "live-node-list",
-  "version": "2.0.0-2",
+  "version": "2.0.0-3",
   "description": "An alternative to NodeList which keeps collections up to date when changes to the DOM occur",
   "main": "lib/index.js",
   "repository": "git@github.com:molovo/live-node-list.git",
