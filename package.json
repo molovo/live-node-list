@@ -27,7 +27,7 @@
     "eslint-plugin-unicorn": "^2.1.2",
     "eslint-plugin-xo": "^1.0.0",
     "gulp": "^3.9.1",
-    "gulp-clone": "^1.0.0",
+    "gulp-clone": "^2.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^3.0.0",
     "uglify-es": "^3.1.3",
