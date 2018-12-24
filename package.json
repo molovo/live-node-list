@@ -24,7 +24,7 @@
     "eslint-plugin-node": "^5.2.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-unicorn": "^2.1.2",
+    "eslint-plugin-unicorn": "^4.0.3",
     "eslint-plugin-xo": "^1.0.0",
     "gulp": "^3.9.1",
     "gulp-clone": "^1.0.0",
