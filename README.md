@@ -42,6 +42,25 @@ items.addEventListener('click', fn)
 items.removeEventListener('click', fn)
 ```
 
+As well as applying event listeners to the items in the list, you can also add
+'delegated' event listeners - that is event listeners attached to another element,
+that are removed when there are no items in the LiveNodeList, and added again
+once items are present.
+
+This is useful, for example adding an event listener for
+the scroll event to the `window`, within which you perform some modification to
+the items in the list. When there are no items in the list, the event listener is
+redundant, so removing it will increase scroll performance.
+
+```js
+const items = new LiveNodeList('.item')
+const onScroll = e => {
+  items.forEach(item => item.innerHTML = item.getBoundingClientRect().top)
+}
+
+items.addDelegatedEventListener(window, 'scroll', onScroll, { passive: true })
+```
+
 LiveNodeList also triggers its own `update` event when the list of items
 changes.
 

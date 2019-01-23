@@ -36,8 +36,20 @@ export default class Observable {
     'eventListeners:remove': [],
     'eventListeners:attach': [],
     'eventListeners:detach': [],
-    'eventListeners:purge': []
+    'eventListeners:purge': [],
+    'delegatedEventListeners:add': [],
+    'delegatedEventListeners:remove': [],
+    'delegatedEventListeners:attach': [],
+    'delegatedEventListeners:detach': [],
+    'delegatedEventListeners:purge': []
   }
+
+  /**
+   * Delegated list events
+   *
+   * @type {object}
+   */
+  delegatedEvents = {}
 
   /**
    * Creates an instance of LiveElement.
@@ -102,6 +114,104 @@ export default class Observable {
     this.eventListeners = {}
 
     this.events['eventListeners:purge'].forEach(callback => callback())
+  }
+
+  /**
+   * Add an event listener to another element, which will be removed when the
+   * list is empty
+   *
+   * @param {HTMLElement} target
+   * @param {string}      event
+   * @param {function}    callback
+   */
+  @bind
+  addDelegatedEventListener (target, event, callback, options) {
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback must be a function')
+    }
+
+    if (!(target instanceof Element || target instanceof Window || target instanceof HTMLDocument)) {
+      throw new TypeError('target must be window, document or an element')
+    }
+
+    if (!(event in this.delegatedEvents)) {
+      this.delegatedEvents[event] = []
+    }
+
+    this.delegatedEvents[event].push({ target, callback, options })
+
+    if (this.items.length > 0) {
+      target.addEventListener(event, callback, options)
+    }
+
+    this.events['delegatedEventListeners:add'].forEach(callback => callback())
+  }
+
+  /**
+   * Remove a delegated event listener from another element
+   *
+   * @param {HTMLElement} target
+   * @param {string}      event
+   * @param {function}    callback
+   */
+  @bind
+  removeDelegatedEventListener (target, event, callback) {
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback must be a function')
+    }
+
+    if (!(target instanceof Element || target instanceof Window || target instanceof HTMLDocument)) {
+      throw new TypeError('target must be window, document or an element')
+    }
+
+    this.delegatedEvents[event] = this.delegatedEvents[event].filter(item => {
+      return !(item.target === target && item.callback === callback)
+    })
+
+    target.removeEventListener(event, callback)
+
+    this.events['delegatedEventListeners:remove'].forEach(callback => callback())
+  }
+
+  /**
+   * Attach all delegated event listeners
+   */
+  @bind
+  attachDelegatedEventListeners () {
+    Object.keys(this.delegatedEvents).forEach(event => {
+      const defs = this.delegatedEvents[event]
+      defs.forEach(def => {
+        def.target.addEventListener(event, def.callback, def.options)
+      })
+    })
+
+    this.events['delegatedEventListeners:attach'].forEach(callback => callback())
+  }
+
+  /**
+   * Detach all delegated event listeners
+   */
+  @bind
+  detachDelegatedEventListeners () {
+    Object.keys(this.delegatedEvents).forEach(event => {
+      const defs = this.delegatedEvents[event]
+      defs.forEach(def => {
+        def.target.removeEventListener(event, def.callback)
+      })
+    })
+
+    this.events['delegatedEventListeners:detach'].forEach(callback => callback())
+  }
+
+  /**
+   * Detach event listeners from all items, and clear the list of listeners
+   */
+  @bind
+  purgeDelegatedEventListeners () {
+    this.detachDelegatedEventListeners()
+    this.delegatedEventListeners = {}
+
+    this.events['delegatedEventListeners:purge'].forEach(callback => callback())
   }
 
   /**

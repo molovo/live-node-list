@@ -162,6 +162,12 @@ export default class LiveNodeList extends Observable {
 
       this.events.update.forEach(callback => callback(newItems, oldItems))
     }
+
+    if (this.items.length > 0) {
+      this.attachDelegatedEventListeners()
+    } else {
+      this.detachDelegatedEventListeners()
+    }
   }
 
   /**
