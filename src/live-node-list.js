@@ -18,7 +18,11 @@ export default class LiveNodeList extends Observable {
   constructor (selector, parent = document.documentElement) {
     super(selector, parent)
 
-    this.items = this.parent.querySelectorAll(this.selector)
+    if (this.parent) {
+      this.items = this.parent.querySelectorAll(this.selector)
+    } else {
+      this.items = []
+    }
 
     this.registerDOMObserver()
   }

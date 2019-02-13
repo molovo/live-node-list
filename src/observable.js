@@ -1,3 +1,4 @@
+import { LiveElement } from './live-element'
 import { bind } from 'decko'
 
 export default class Observable {
@@ -59,7 +60,18 @@ export default class Observable {
    */
   constructor (selector, parent = document.documentElement) {
     this.selector = selector
-    this.parent = parent
+
+    if (parent instanceof this.constructor) {
+      this.parent = parent.item
+      parent.on('update', (newItem, oldItem) => {
+        this.pause()
+        this.parent = newItem
+        this.resume()
+        this.refresh()
+      })
+    } else {
+      this.parent = parent
+    }
   }
 
   /**
@@ -222,14 +234,7 @@ export default class Observable {
   registerDOMObserver () {
     this.observer = new MutationObserver(this.refresh)
 
-    if (this.parent) {
-      this.observer.observe(this.parent, {
-        attributes: false,
-        characterData: false,
-        childList: true,
-        subtree: true
-      })
-    }
+    this.resume()
 
     this.events.start.forEach(callback => callback())
   }

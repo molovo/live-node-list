@@ -18,7 +18,9 @@ export default class LiveElement extends Observable {
   constructor (selector, parent = document.documentElement) {
     super(selector, parent)
 
-    this.item = this.parent.querySelector(this.selector)
+    if (this.parent) {
+      this.item = this.parent.querySelector(this.selector)
+    }
 
     this.registerDOMObserver()
   }
