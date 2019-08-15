@@ -152,7 +152,7 @@ export default class Observable {
 
     this.delegatedEvents[event].push({ target, callback, options })
 
-    if (this.items.length > 0) {
+    if ((('items' in this) && this.items.length > 0) || (('item' in this) && this.item)) {
       target.addEventListener(event, callback, options)
     }
 
