@@ -10,6 +10,18 @@ export default class Observable {
   eventListeners = {}
 
   /**
+   * Configuration to pass to elements observed by mutation observer
+   *
+   * @type {object}
+   */
+  observerConfig = {
+    attributes: false,
+    characterData: false,
+    childList: true,
+    subtree: true,
+  }
+
+  /**
    * The CSS selector used to collect items
    *
    * @type string
@@ -58,8 +70,13 @@ export default class Observable {
    * @param {string}      selector
    * @param {HTMLElement} parent
    */
-  constructor (selector, parent = document.documentElement) {
+  constructor(selector, parent = document.documentElement, config = {}) {
     this.selector = selector
+
+    this.observerConfig = {
+      ...this.observerConfig,
+      ...config,
+    }
 
     if (parent instanceof this.constructor) {
       this.parent = parent.item
@@ -255,12 +272,7 @@ export default class Observable {
   @bind
   resume () {
     if (this.parent) {
-      this.observer.observe(this.parent, {
-        attributes: false,
-        characterData: false,
-        childList: true,
-        subtree: true
-      })
+      this.observer.observe(this.parent, this.observerConfig)
     }
 
     this.events.resume.forEach(callback => callback())

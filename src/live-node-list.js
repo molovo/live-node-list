@@ -15,8 +15,8 @@ export default class LiveNodeList extends Observable {
    * @param {string}      selector
    * @param {HTMLElement} parent
    */
-  constructor (selector, parent = document.documentElement) {
-    super(selector, parent)
+  constructor(selector, parent = document.documentElement, config = {}) {
+    super(selector, parent, config)
 
     if (this.parent) {
       this.items = this.parent.querySelectorAll(this.selector)
