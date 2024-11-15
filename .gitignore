@@ -64,3 +64,9 @@ typings/
 # compiled directories
 dist/
 lib/
+
+# Compiled output
+*.js
+*.d.ts
+*.d.ts.map
+tsconfig.tsbuildinfo

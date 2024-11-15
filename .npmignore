@@ -1,9 +1,9 @@
 .babelrc
-.eslintrc
+.eslintrc.js
 .gitignore
 .travis.yml
-Makefile
+LICENSE
+README.md
+tsconfig.eslint.json
 yarn.lock
-dist/
-src/
-gulpfile.babel.js
+src/**/*
