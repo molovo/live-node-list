@@ -30,6 +30,8 @@ parameter
 const items = new LiveNodeList('.item', document.getElementById('my-container'))
 ```
 
+### Event Listeners
+
 LiveNodeList also maintains an internal list of event listeners, and exposes
 `addEventListener()` and `removeEventListener()` methods. Adding an event
 listener will cascade it to each of the items in the list, and will handle
@@ -41,6 +43,8 @@ const items = new LiveNodeList('.item')
 items.addEventListener('click', fn)
 items.removeEventListener('click', fn)
 ```
+
+### Delegated Event Listeners
 
 As well as applying event listeners to the items in the list, you can also add
 'delegated' event listeners - that is event listeners attached to another element,
@@ -55,11 +59,13 @@ redundant, so removing it will increase scroll performance.
 ```js
 const items = new LiveNodeList('.item')
 const onScroll = e => {
-  items.forEach(item => item.innerHTML = item.getBoundingClientRect().top)
+  items.forEach(item => (item.innerHTML = item.getBoundingClientRect().top))
 }
 
 items.addDelegatedEventListener(window, 'scroll', onScroll, { passive: true })
 ```
+
+### Internal Events
 
 LiveNodeList also triggers its own `update` event when the list of items
 changes.
@@ -71,31 +77,36 @@ items.on('update', (newItems, oldItems) => {
 })
 ```
 
-The other supported events are as follows:
+The other supported internal events are as follows:
 
-* `start` - fired when observation first begins
-* `pause` - fired when the `pause()` method is called
-* `resume` - fired when the `resume()` method is called
-* `eventListeners:add` - fired when an event listener is added to the list
-* `eventListeners:remove` - fired when an event listener is removed from the list
-* `eventListeners:attach` - fired when the stored event listeners are attached
-* `eventListeners:detach` - fired when the stored event listeners are detached
-* `eventListeners:purge` - fired when the list of event listeners is purged
+- `start` - fired when observation first begins
+- `pause` - fired when the `pause()` method is called
+- `resume` - fired when the `resume()` method is called
+- `eventListeners:add` - fired when an event listener is added to the list
+- `eventListeners:remove` - fired when an event listener is removed from the list
+- `eventListeners:attach` - fired when the stored event listeners are attached
+- `eventListeners:detach` - fired when the stored event listeners are detached
+- `eventListeners:purge` - fired when the list of event listeners is purged
 
-If your update method triggers HTML changes within the parent, you can get caught in an infinite loop, where those changes trigger the update function recursively. If this happens, you can pause and resume LiveNodeList's observation to prevent recursive calls while you make the necessary updates.
+### Methods
 
-```js
-const items = new LiveNodeList('.item')
-items.on('update', (newItems, oldItems) => {
-  items.pause()
+LiveNodeList proxies a number of methods from Array.prototype, which are called on the internal list of items. Methods which modify the original array are not proxied, so that the contents always reflect the DOM.
 
-  newItems.forEach(item => {
-    // Do something which updates item's HTML
-  })
+The full list of proxied methods is as follows:
 
-  items.resume()
-})
-```
+- `every`
+- `filter`
+- `find`
+- `findIndex`
+- `forEach`
+- `includes`
+- `indexOf`
+- `lastIndexOf`
+- `map`
+- `reduce`
+- `reduceRight`
+- `slice`
+- `some`
 
 ## LiveElement
 
@@ -111,3 +122,83 @@ item.on('update', (newItem, oldItem) => {
   // Do something
 })
 ```
+
+### Methods
+
+Like LiveNodeList, LiveElement also proxies a number of properties and methods from HTMLElement.prototype, which are called on the internal element.
+
+The full list of proxied properties and methods is as follows:
+
+- Inherited properties:
+
+  - `attributes`
+  - `childElementCount`
+  - `childNodes`
+  - `children`
+  - `clientHeight`
+  - `clientLeft`
+  - `clientTop`
+  - `clientWidth`
+  - `classList`
+  - `className`
+  - `firstElementChild`
+  - `id`
+  - `innerHTML`
+  - `innerText`
+  - `lastElementChild`
+  - `localName`
+  - `namespaceURI`
+  - `nextElementSibling`
+  - `onfullscreenchange`
+  - `onfullscreenerror`
+  - `outerHTML`
+  - `ownerDocument`
+  - `part`
+  - `prefix`
+  - `previousElementSibling`
+  - `scrollHeight`
+  - `scrollLeft`
+  - `scrollTop`
+  - `scrollWidth`
+  - `shadowRoot`
+  - `slot`
+  - `style`
+  - `tabIndex`
+  - `tagName`
+  - `textContent`
+
+- Inherited methods:
+  - `append`
+  - `appendChild`
+  - `closest`
+  - `cloneNode`
+  - `compareDocumentPosition`
+  - `contains`
+  - `getAttribute`
+  - `getAttributeNode`
+  - `getAttributeNodeNS`
+  - `getAttributeNS`
+  - `getBoundingClientRect`
+  - `getClientRects`
+  - `getElementsByClassName`
+  - `getElementsByTagName`
+  - `getElementsByTagNameNS`
+  - `hasAttribute`
+  - `hasAttributeNS`
+  - `insertAdjacentElement`
+  - `insertAdjacentHTML`
+  - `insertAdjacentText`
+  - `insertBefore`
+  - `matches`
+  - `querySelector`
+  - `querySelectorAll`
+  - `remove`
+  - `removeAttribute`
+  - `removeAttributeNode`
+  - `removeAttributeNS`
+  - `removeChild`
+  - `replaceWith`
+  - `setAttribute`
+  - `setAttributeNode`
+  - `setAttributeNodeNS`
+  - `setAttributeNS`
