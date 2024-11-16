@@ -12,6 +12,7 @@ import {
 
 type InheritedMethods =
   | 'every'
+  | 'filter'
   | 'find'
   | 'findIndex'
   | 'forEach'
@@ -176,10 +177,13 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
       this.attachEventListeners(newItems)
 
       this.items = selected
+
+      this.pause()
       this.events.update.forEach(
         (callback: InternalEventListenerMap<this, T>['update']) =>
           callback(newItems, oldItems)
       )
+      this.resume()
     }
 
     if (this.isEmpty) {
@@ -246,6 +250,20 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
    * so that the contents always reflect the DOM.
    *
    ======================================================================*/
+  every<T>(
+    predicate: (value: T, index: number, array: T[]) => value is T,
+    thisArg?: any
+  ): this is T[] {
+    return Array.prototype.every.call(this.items, predicate, thisArg)
+  }
+
+  filter(
+    predicate: (value: T, index: number, array: T[]) => unknown,
+    thisArg?: any
+  ): T[] {
+    return Array.prototype.filter.call(this.items, predicate, thisArg)
+  }
+
   find(
     predicate: (value: T, index: number, obj: T[]) => unknown,
     thisArg?: any
@@ -260,15 +278,15 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
     return Array.prototype.findIndex.call(this.items, predicate, thisArg)
   }
 
-  every<T>(
-    predicate: (value: T, index: number, array: T[]) => value is T,
+  forEach(
+    callbackfn: (value: T, index: number, array: T[]) => void,
     thisArg?: any
-  ): this is T[] {
-    return Array.prototype.every.call(this.items, predicate, thisArg)
+  ): void {
+    Array.prototype.forEach.call(this.items, callbackfn, thisArg)
   }
 
-  slice(start?: number, end?: number): T[] {
-    return Array.prototype.slice.call(this.items, start, end)
+  includes(searchElement: T, fromIndex?: number): boolean {
+    return Array.prototype.includes.call(this.items, searchElement, fromIndex)
   }
 
   indexOf(searchElement: T, fromIndex?: number): number {
@@ -283,36 +301,11 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
     )
   }
 
-  some(
-    predicate: (value: T, index: number, array: T[]) => unknown,
-    thisArg?: any
-  ): boolean {
-    return Array.prototype.some.call(this.items, predicate, thisArg)
-  }
-
-  forEach(
-    callbackfn: (value: T, index: number, array: T[]) => void,
-    thisArg?: any
-  ): void {
-    Array.prototype.forEach.call(this.items, callbackfn, thisArg)
-  }
-
   map<U>(
     callbackfn: (value: T, index: number, array: T[]) => U,
     thisArg?: any
   ): U[] {
     return Array.prototype.map.call(this.items, callbackfn, thisArg) as U[]
-  }
-
-  filter(
-    predicate: (value: T, index: number, array: T[]) => unknown,
-    thisArg?: any
-  ): T[] {
-    return Array.prototype.filter.call(this.items, predicate, thisArg)
-  }
-
-  includes(searchElement: T, fromIndex?: number): boolean {
-    return Array.prototype.includes.call(this.items, searchElement, fromIndex)
   }
 
   reduce<U>(
@@ -355,5 +348,16 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
       ) => U,
       initialValue
     ) as U
+  }
+
+  slice(start?: number, end?: number): T[] {
+    return Array.prototype.slice.call(this.items, start, end)
+  }
+
+  some(
+    predicate: (value: T, index: number, array: T[]) => unknown,
+    thisArg?: any
+  ): boolean {
+    return Array.prototype.some.call(this.items, predicate, thisArg)
   }
 }
