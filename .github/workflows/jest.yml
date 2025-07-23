@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Building project and running ava tests
+    name: Building project and running Jest tests
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +30,7 @@ jobs:
       - name: Build Site
         run: yarn run build
 
-      - name: Run ava tests
+      - name: Run Jest tests
         run: yarn run test 2>&1 | tee test_output.txt
 
       - name: Read test_output file.
@@ -54,5 +54,5 @@ jobs:
       - name: Check for pa11y failures.
         if: contains(steps.test_output.outputs.content, 'errno 2')
         run: |
-          echo "::error::The site is failing tests. Please review the comment in the pull request or the ava step in the workflow for details."
+          echo "::error::The site is failing tests. Please review the comment in the pull request or the Jest step in the workflow for details."
           exit 1
