@@ -316,15 +316,11 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   }
 
   get innerText(): string {
-    if (!this.item || !(this.item instanceof Element)) {
-      return ''
-    }
-
     return this.item?.innerText || ''
   }
 
   set innerText(value: string) {
-    if (this.item && this.item instanceof Element) {
+    if (this.item) {
       this.item.innerText = value
     }
   }

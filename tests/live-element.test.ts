@@ -14,10 +14,6 @@ describe('LiveElement', () => {
     document = dom.window.document
     root = document.getElementById('root')!
 
-    if (typeof global.Element === 'undefined') {
-      global.Element = dom.window.Element
-    }
-
     if (typeof global.document === 'undefined') {
       global.document = document
     }
