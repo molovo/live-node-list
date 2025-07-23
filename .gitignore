@@ -70,3 +70,5 @@ lib/
 *.d.ts
 *.d.ts.map
 tsconfig.tsbuildinfo
+
+!babel.config.js
