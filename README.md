@@ -21,10 +21,7 @@ LiveNodeList creates a [MutationObserver](https://developer.mozilla.org/en-US/do
 By default, LiveNodeList selects within `document.documentElement`, but you can limit the scope of the query by passing in a parent element as a second parameter.
 
 ```js
-const items = new LiveNodeList(
-  '.item',
-  document.getElementById('my-container')
-)
+const items = new LiveNodeList('.item', document.getElementById('my-container'))
 ```
 
 By default, LiveNodeList only monitors for subtree and childList changes to keep performance snappy. However, you can override the default [MutationObserver options](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) by passing in a third parameter:
@@ -65,12 +62,7 @@ const onScroll = e => {
   items.forEach(item => (item.innerHTML = item.getBoundingClientRect().top))
 }
 
-items.addDelegatedEventListener(
-  window,
-  'scroll',
-  onScroll,
-  { passive: true }
-)
+items.addDelegatedEventListener(window, 'scroll', onScroll, { passive: true })
 ```
 
 ### Internal Events
@@ -137,78 +129,111 @@ Like LiveNodeList, LiveElement also proxies a number of properties and methods f
 The full list of proxied properties and methods is as follows:
 
 - Inherited properties:
+
   - [`attributes`](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes)
   - [`childElementCount`](https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount)
-  - `childNodes`
-  - `children`
-  - `clientHeight`
-  - `clientLeft`
-  - `clientTop`
-  - `clientWidth`
-  - `classList`
-  - `className`
-  - `firstElementChild`
-  - `id`
-  - `innerHTML`
-  - `innerText`
-  - `lastElementChild`
-  - `localName`
-  - `namespaceURI`
-  - `nextElementSibling`
-  - `onfullscreenchange`
-  - `onfullscreenerror`
-  - `outerHTML`
-  - `ownerDocument`
-  - `part`
-  - `prefix`
-  - `previousElementSibling`
-  - `scrollHeight`
-  - `scrollLeft`
-  - `scrollTop`
-  - `scrollWidth`
-  - `shadowRoot`
-  - `slot`
-  - `style`
-  - `tabIndex`
-  - `tagName`
-  - `textContent`
+  - [`childNodes`](https://developer.mozilla.org/en-US/docs/Web/API/Element/childNodes)
+  - [`children`](https://developer.mozilla.org/en-US/docs/Web/API/Element/children)
+  - [`clientHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight)
+  - [`clientLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientLeft)
+  - [`clientTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientTop)
+  - [`clientWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth)
+  - [`classList`](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList)
+  - [`className`](https://developer.mozilla.org/en-US/docs/Web/API/Element/className)
+  - [`firstElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild)
+  - [`id`](https://developer.mozilla.org/en-US/docs/Web/API/Element/id)
+  - [`innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML)
+  - [`innerText`](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerText)
+  - [`lastElementChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild)
+  - [`localName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/localName)
+  - [`namespaceURI`](https://developer.mozilla.org/en-US/docs/Web/API/Element/namespaceURI)
+  - [`nextElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling)
+  - [`onfullscreenchange`](https://developer.mozilla.org/en-US/docs/Web/API/Element/onfullscreenchange)
+  - [`onfullscreenerror`](https://developer.mozilla.org/en-US/docs/Web/API/Element/onfullscreenerror)
+  - [`outerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/Element/outerHTML)
+  - [`ownerDocument`](https://developer.mozilla.org/en-US/docs/Web/API/Element/ownerDocument)
+  - [`part`](https://developer.mozilla.org/en-US/docs/Web/API/Element/part)
+  - [`prefix`](https://developer.mozilla.org/en-US/docs/Web/API/Element/prefix)
+  - [`previousElementSibling`](https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling)
+  - [`scrollHeight`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight)
+  - [`scrollLeft`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollLeft)
+  - [`scrollTop`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop)
+  - [`scrollWidth`](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth)
+  - [`shadowRoot`](https://developer.mozilla.org/en-US/docs/Web/API/Element/shadowRoot)
+  - [`slot`](https://developer.mozilla.org/en-US/docs/Web/API/Element/slot)
+  - [`style`](https://developer.mozilla.org/en-US/docs/Web/API/Element/style)
+  - [`tabIndex`](https://developer.mozilla.org/en-US/docs/Web/API/Element/tabIndex)
+  - [`tagName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+  - [`textContent`](https://developer.mozilla.org/en-US/docs/Web/API/Element/textContent)
 
 - Inherited methods:
-  - `append`
-  - `appendChild`
-  - `closest`
-  - `cloneNode`
-  - `compareDocumentPosition`
-  - `contains`
-  - `getAttribute`
-  - `getAttributeNode`
-  - `getAttributeNodeNS`
-  - `getAttributeNS`
-  - `getBoundingClientRect`
-  - `getClientRects`
-  - `getElementsByClassName`
-  - `getElementsByTagName`
-  - `getElementsByTagNameNS`
-  - `hasAttribute`
-  - `hasAttributeNS`
-  - `insertAdjacentElement`
-  - `insertAdjacentHTML`
-  - `insertAdjacentText`
-  - `insertBefore`
-  - `matches`
-  - `querySelector`
-  - `querySelectorAll`
-  - `remove`
-  - `removeAttribute`
-  - `removeAttributeNode`
-  - `removeAttributeNS`
-  - `removeChild`
-  - `replaceWith`
-  - `setAttribute`
-  - `setAttributeNode`
-  - `setAttributeNodeNS`
-  - `setAttributeNS`
+  - [`append`](https://developer.mozilla.org/en-US/docs/Web/API/Element/append)
+  - [`appendChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/appendChild)
+  - [`closest`](https://developer.mozilla.org/en-US/docs/Web/API/Element/closest)
+  - [`cloneNode`](https://developer.mozilla.org/en-US/docs/Web/API/Element/cloneNode)
+  - [`compareDocumentPosition`](https://developer.mozilla.org/en-US/docs/Web/API/Element/compareDocumentPosition)
+  - [`contains`](https://developer.mozilla.org/en-US/docs/Web/API/Element/contains)
+  - [`getAttribute`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute)
+  - [`getAttributeNode`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNode)
+  - [`getAttributeNodeNS`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNodeNS)
+  - [`getAttributeNS`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNS)
+  - [`getBoundingClientRect`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect)
+  - [`getClientRects`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects)
+  - [`getElementsByClassName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByClassName)
+  - [`getElementsByTagName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagName)
+  - [`getElementsByTagNameNS`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagNameNS)
+  - [`hasAttribute`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute)
+  - [`hasAttributeNS`](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttributeNS)
+  - [`insertAdjacentElement`](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement)
+  - [`insertAdjacentHTML`](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML)
+  - [`insertAdjacentText`](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText)
+  - [`insertBefore`](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertBefore)
+  - [`matches`](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches)
+  - [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelector)
+  - [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelectorAll)
+  - [`remove`](https://developer.mozilla.org/en-US/docs/Web/API/Element/remove)
+  - [`removeAttribute`](https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute)
+  - [`removeAttributeNode`](https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttributeNode)
+  - [`removeAttributeNS`](https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttributeNS)
+  - [`removeChild`](https://developer.mozilla.org/en-US/docs/Web/API/Element/removeChild)
+  - [`replaceWith`](https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith)
+  - [`setAttribute`](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute)
+  - [`setAttributeNode`](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttributeNode)
+  - [`setAttributeNodeNS`](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttributeNodeNS)
+  - [`setAttributeNS`](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttributeNS)
 
 ## React
 
-When using LiveNodeList or LiveElement with React, you should be aware that the
+When using LiveNodeList or LiveElement with React, you should be aware that any eventListeners or handlers attached to the live node list will remain in place after the component is unmounted. Similarly, if your selector or parent are passed into the component as props, the LiveNodeList/LiveElement will need to be recreated. To avoid this, you should use the `destroy()` method to destruct the LiveNodeList/LiveElement when components unmount.
+
+```js
+const MyComponent = ({ selector }) => {}
+  const list = useRef<LiveNodeList>(null)
+  const parent = useRef<LiveNodeList<HTMLElement>>(null)
+
+  useEffect(() => {
+    if (list.current) {
+      list.destroy()
+    }
+
+    list.current = new LiveNodeList(selector)
+
+    return () => {
+      if (list.current) {
+        list.destroy()
+      }
+    }
+  }, [selector])
+
+  list.current?.addEventListener('click', () => {})
+}
+```
+
+To simplify this, LiveNodeList comes with two react hooks, `useLiveNodeList` and `useLiveElement`, which will handle destroying and recreating the LiveNodeList for you when necessary. Both accept the same arguments as their respective constructors.
+
+```js
+const el = useRef < HTMLElement > null
+const list = useLiveNodeList('.selector', el.current)
+
+list.addEventListener('click', () => {})
+```
