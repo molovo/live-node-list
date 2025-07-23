@@ -41,6 +41,14 @@
     "@types/react": "^17.0.1",
     "react": "^17.0.1"
   },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "yarn build",
