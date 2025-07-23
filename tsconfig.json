@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "ES2021"
-    ],
+    "lib": ["dom", "dom.iterable", "ES2021"],
     "declaration": true,
     "declarationMap": true,
     "experimentalDecorators": true,
@@ -29,16 +25,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "!src/**/*"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "!src/**/*"]
 }

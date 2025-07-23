@@ -1,7 +1,6 @@
 # LiveNodeList
 
-An alternative to NodeList which keeps collections up to date when changes to
-the DOM occur
+An alternative to NodeList which keeps collections up to date when changes to the DOM occur.
 
 ## Install
 
@@ -11,31 +10,41 @@ npm install live-node-list
 
 ## Usage
 
-Use the LiveNodeList constructor anywhere you would normally use
-`Element.querySelectorAll()`.
+Use the LiveNodeList constructor anywhere you would normally use `Element.querySelectorAll()`.
 
 ```js
 const items = new LiveNodeList('.item')
 ```
 
-LiveNodeList creates a [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) instance to monitor for childList and
-subtree changes within the parent, and refreshes the list of items whenever the
-childList changes.
+LiveNodeList creates a [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) instance to monitor for childList and subtree changes within the parent, and refreshes the list of items whenever the childList changes.
 
-By default, LiveNodeList selects within `document.documentElement`, but you
-can limit the scope of the query by passing in a parent element as a second
-parameter
+By default, LiveNodeList selects within `document.documentElement`, but you can limit the scope of the query by passing in a parent element as a second parameter.
 
 ```js
-const items = new LiveNodeList('.item', document.getElementById('my-container'))
+const items = new LiveNodeList(
+  '.item',
+  document.getElementById('my-container')
+)
 ```
 
-### Event Listeners
+By default, LiveNodeList only monitors for subtree and childList changes to keep performance snappy. However, you can override the default [MutationObserver options](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe#options) by passing in a third parameter:
 
-LiveNodeList also maintains an internal list of event listeners, and exposes
-`addEventListener()` and `removeEventListener()` methods. Adding an event
-listener will cascade it to each of the items in the list, and will handle
-attaching the event listener to new items when the list of items changes.
+```js
+const activeTabs = new LiveNodeList(
+  '.tab[aria-expanded="true"]',
+  document.documentElement,
+  {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['aria-expanded'],
+  }
+)
+```
+
+### Event Listeners
+
+LiveNodeList also maintains an internal list of event listeners, and exposes `addEventListener()` and `removeEventListener()` methods. Adding an event listener will cascade it to each of the items in the list, and will handle attaching the event listener to new items when the list of items changes.
 
 ```js
 const fn = () => {}
@@ -46,15 +55,9 @@ items.removeEventListener('click', fn)
 
 ### Delegated Event Listeners
 
-As well as applying event listeners to the items in the list, you can also add
-'delegated' event listeners - that is event listeners attached to another element,
-that are removed when there are no items in the LiveNodeList, and added again
-once items are present.
+As well as applying event listeners to the items in the list, you can also add 'delegated' event listeners - that is event listeners attached to another element, that are removed when there are no items in the LiveNodeList, and added again once items are present.
 
-This is useful, for example adding an event listener for
-the scroll event to the `window`, within which you perform some modification to
-the items in the list. When there are no items in the list, the event listener is
-redundant, so removing it will increase scroll performance.
+This is useful, for example adding an event listener for the scroll event to the `window`, within which you access the items in the list. When there are no items in the list, the event listener is redundant, so removing it will increase scroll performance.
 
 ```js
 const items = new LiveNodeList('.item')
@@ -62,13 +65,17 @@ const onScroll = e => {
   items.forEach(item => (item.innerHTML = item.getBoundingClientRect().top))
 }
 
-items.addDelegatedEventListener(window, 'scroll', onScroll, { passive: true })
+items.addDelegatedEventListener(
+  window,
+  'scroll',
+  onScroll,
+  { passive: true }
+)
 ```
 
 ### Internal Events
 
-LiveNodeList also triggers its own `update` event when the list of items
-changes.
+LiveNodeList also triggers its own `update` event when the list of items changes.
 
 ```js
 const items = new LiveNodeList('.item')
@@ -90,27 +97,27 @@ The other supported internal events are as follows:
 
 ### Methods
 
-LiveNodeList proxies a number of methods from Array.prototype, which are called on the internal list of items. Methods which modify the original array are not proxied, so that the contents always reflect the DOM.
+LiveNodeList proxies a number of methods from Array prototype, which are called on the internal list of items. Methods which modify the original array are not proxied, so that the contents always reflect the DOM.
 
 The full list of proxied methods is as follows:
 
-- `every`
-- `filter`
-- `find`
-- `findIndex`
-- `forEach`
-- `includes`
-- `indexOf`
-- `lastIndexOf`
-- `map`
-- `reduce`
-- `reduceRight`
-- `slice`
-- `some`
+- [`every`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
+- [`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+- [`find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+- [`findIndex`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
+- [`forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)
+- [`includes`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
+- [`indexOf`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
+- [`lastIndexOf`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf)
+- [`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+- [`reduce`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)
+- [`reduceRight`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)
+- [`slice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
+- [`some`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
 
 ## LiveElement
 
-LiveNodeList also comes with a `LiveElement` class, which is used to attach a single element, and is useful as a replacement for `document.getElementById` which provides the same API as LiveNodeList.
+LiveNodeList also comes with a `LiveElement` class, which is used to attach a single element, and is useful as a replacement for `Element.querySelector` which provides the same API as LiveNodeList.
 
 ```js
 import { LiveElement } from 'live-node-list'
@@ -125,14 +132,13 @@ item.on('update', (newItem, oldItem) => {
 
 ### Methods
 
-Like LiveNodeList, LiveElement also proxies a number of properties and methods from HTMLElement.prototype, which are called on the internal element.
+Like LiveNodeList, LiveElement also proxies a number of properties and methods from the Element and HTMLElement prototypes, which are called on the internal element.
 
 The full list of proxied properties and methods is as follows:
 
 - Inherited properties:
-
-  - `attributes`
-  - `childElementCount`
+  - [`attributes`](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes)
+  - [`childElementCount`](https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount)
   - `childNodes`
   - `children`
   - `clientHeight`
@@ -202,3 +208,7 @@ The full list of proxied properties and methods is as follows:
   - `setAttributeNode`
   - `setAttributeNodeNS`
   - `setAttributeNS`
+
+## React
+
+When using LiveNodeList or LiveElement with React, you should be aware that the

@@ -1,0 +1,58 @@
+name: jest
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    name: Building project and running ava tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Setup Latest Yarn
+        uses: threeal/setup-yarn-action@v2.0.0
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build Site
+        run: yarn run build
+
+      - name: Run ava tests
+        run: yarn run test 2>&1 | tee test_output.txt
+
+      - name: Read test_output file.
+        id: test_output
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./test_output.txt
+
+      - name: Comment on pull request.
+        uses: thollander/actions-comment-pull-request@v2
+        if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: '<details><summary>Testing results</summary>
+
+
+```${{ steps.test_output.outputs.content }}```
+
+</details>'
+
+      - name: Check for pa11y failures.
+        if: contains(steps.test_output.outputs.content, 'errno 2')
+        run: |
+          echo "::error::The site is failing tests. Please review the comment in the pull request or the ava step in the workflow for details."
+          exit 1
