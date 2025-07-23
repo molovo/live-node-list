@@ -1,5 +1,4 @@
-import { bind } from 'decko'
-import LiveElement from './live-element.js'
+import type LiveElement from './live-element.js'
 import {
   Config,
   DelegatedEventListener,
@@ -13,7 +12,12 @@ import {
   Parent,
 } from './types.js'
 
-export default class Observable<T extends HTMLElement> {
+export default abstract class Observable<T extends HTMLElement> {
+  abstract get isEmpty(): boolean
+  protected abstract refresh(): void
+  abstract detachEventListeners(): void
+  abstract attachEventListeners(): void
+
   /**
    * A store of eventListener callbacks which will be attached to the item
    */
@@ -37,7 +41,29 @@ export default class Observable<T extends HTMLElement> {
   /**
    * The parent element of the underlying element
    */
-  protected parent?: Parent | LiveElement = document.documentElement
+  protected _parent?: Parent | LiveElement =
+    typeof document !== 'undefined' ? document.documentElement : undefined
+
+  get parent(): Parent | undefined {
+    if (this._parent && 'item' in this._parent) {
+      return (this._parent as LiveElement<HTMLElement>).item
+    }
+
+    return this._parent as Parent
+  }
+
+  set parent(parent: Parent | LiveElement) {
+    this._parent = parent
+
+    if (this._parent && 'item' in this._parent) {
+      ;(this._parent as LiveElement<HTMLElement>).on(
+        'update',
+        (newItem?: HTMLElement) => {
+          this.refresh()
+        }
+      )
+    }
+  }
 
   /**
    * List Events
@@ -78,7 +104,9 @@ export default class Observable<T extends HTMLElement> {
    */
   constructor(
     selector: string,
-    parent: Parent | LiveElement = document.documentElement,
+    parent: Parent | LiveElement = typeof document !== 'undefined'
+      ? document.documentElement
+      : (undefined as any),
     config: Config = {}
   ) {
     this.selector = selector
@@ -88,26 +116,9 @@ export default class Observable<T extends HTMLElement> {
       ...config,
     }
 
-    if (
-      parent instanceof LiveElement &&
-      parent.constructor.name === 'LiveElement'
-    ) {
-      this.parent = parent.item
-      parent.on(
-        'update',
-        (newItem?: typeof parent['item'], oldItem?: typeof parent['item']) => {
-          this.pause()
-          this.parent = newItem
-          this.resume()
-          this.refresh()
-        }
-      )
-    } else {
-      this.parent = parent
-    }
+    this.parent = parent
   }
 
-  @bind
   on<E extends InternalEventName<this, T>>(
     event: E,
     callback: InternalEventListener<this, T, E>
@@ -117,7 +128,6 @@ export default class Observable<T extends HTMLElement> {
     return this
   }
 
-  @bind
   off<E extends InternalEventName<this, T>>(
     event: E,
     callback: InternalEventListener<this, T, E>
@@ -135,14 +145,12 @@ export default class Observable<T extends HTMLElement> {
   /**
    * Detach event listeners from all items, and clear the list of listeners
    */
-  @bind
   purgeEventListeners() {
     this.detachEventListeners()
     this.eventListeners = {}
     this.events['eventListeners:purge'].forEach(callback => callback())
   }
 
-  @bind
   addEventListener<E extends EventName>(
     event: E,
     listener: EventListener<E>['listener'],
@@ -155,7 +163,6 @@ export default class Observable<T extends HTMLElement> {
     this.eventListeners[event]?.push({ listener, options })
   }
 
-  @bind
   removeEventListener<E extends EventName>(
     event: E,
     listener: EventListener<E>['listener']
@@ -170,10 +177,9 @@ export default class Observable<T extends HTMLElement> {
    * Add an event listener to another element, which will be removed when the
    * list is empty
    */
-  @bind
   addDelegatedEventListener<E extends EventName>(
-    event: E,
     target: Document | HTMLElement | Window,
+    event: E,
     listener: DelegatedEventListener<E>['listener'],
     options: AddEventListenerOptions
   ) {
@@ -197,7 +203,6 @@ export default class Observable<T extends HTMLElement> {
   /**
    * Remove a delegated event listener from another element
    */
-  @bind
   removeDelegatedEventListener<E extends EventName>(
     target: Document | HTMLElement | Window,
     event: E,
@@ -220,10 +225,9 @@ export default class Observable<T extends HTMLElement> {
     )
   }
 
-  /**
+  /*
    * Attach all delegated event listeners
    */
-  @bind
   attachDelegatedEventListeners() {
     Object.keys(this.delegatedEventListeners).forEach(event => {
       const defs = this.delegatedEventListeners[event as EventName] || []
@@ -243,7 +247,6 @@ export default class Observable<T extends HTMLElement> {
   /**
    * Detach all delegated event listeners
    */
-  @bind
   detachDelegatedEventListeners() {
     Object.keys(this.delegatedEventListeners).forEach(event => {
       const defs = this.delegatedEventListeners[event as EventName] || []
@@ -262,7 +265,6 @@ export default class Observable<T extends HTMLElement> {
   /**
    * Detach event listeners from all items, and clear the list of listeners
    */
-  @bind
   purgeDelegatedEventListeners() {
     this.detachDelegatedEventListeners()
     this.delegatedEventListeners = {}
@@ -273,9 +275,9 @@ export default class Observable<T extends HTMLElement> {
    * Create a MutationObserver instance to monitor the entire DOM,
    * and refresh the element when the node tree changes
    */
-  @bind
   protected registerDOMObserver() {
-    this.observer = new MutationObserver(this.refresh)
+    // Explicitly bind 'refresh' to this to avoid context issues
+    this.observer = new MutationObserver(() => this.refresh())
 
     this.resume()
     this.events.start?.forEach(callback => callback())
@@ -284,7 +286,6 @@ export default class Observable<T extends HTMLElement> {
   /**
    * Pause observation of the element's parent
    */
-  @bind
   pause() {
     if (this.observer) {
       this.observer.disconnect()
@@ -296,7 +297,6 @@ export default class Observable<T extends HTMLElement> {
   /**
    * Resume observation of the element's parent
    */
-  @bind
   resume() {
     if (this.parent && this.observer) {
       this.observer.observe(this.parent as Node, this.observerConfig)
@@ -305,26 +305,9 @@ export default class Observable<T extends HTMLElement> {
     this.events.resume?.forEach(callback => callback())
   }
 
-  @bind
   destroy() {
     this.pause()
     this.purgeEventListeners()
     this.purgeDelegatedEventListeners()
-  }
-
-  get isEmpty(): boolean {
-    throw new Error('isEmpty accessor must be implemented')
-  }
-
-  refresh() {
-    throw new Error('refresh method must be implemented')
-  }
-
-  detachEventListeners() {
-    throw new Error('detachEventListeners method must be implemented')
-  }
-
-  attachEventListeners() {
-    throw new Error('attachEventListeners method must be implemented')
   }
 }

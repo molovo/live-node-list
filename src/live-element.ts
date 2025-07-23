@@ -1,4 +1,3 @@
-import { bind } from 'decko'
 import Observable from './observable.js'
 import {
   Config,
@@ -84,15 +83,23 @@ type InheritedMethods =
   | 'setAttributeNS'
 
 interface LiveElementInterface<T extends HTMLElement = HTMLElement>
-  extends Pick<T, InheritedProperties & InheritedMethods> {}
+  extends ObservableInterface,
+    Pick<T, InheritedProperties & InheritedMethods> {}
 
 export default class LiveElement<T extends HTMLElement = HTMLElement>
   extends Observable<T>
-  implements ObservableInterface, LiveElementInterface<T> {
+  implements LiveElementInterface<T> {
   /**
    * The underlying element
    */
-  item: T | undefined = undefined
+  private _item: T | undefined = undefined
+
+  /**
+   * Read-only accessor for _item
+   */
+  get item(): T | undefined {
+    return this._item
+  }
 
   /**
    * Accessor to determine if LiveElement is populated
@@ -112,18 +119,15 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
     super(selector, parent, config)
 
     if (this.parent) {
-      this.item = (this.parent.querySelector(this.selector) as T) || undefined
+      this._item = (this.parent.querySelector(this.selector) as T) || undefined
     }
 
     this.registerDOMObserver()
-
-    return new Proxy<LiveElement<T>>(this, this)
   }
 
   /**
    * Proxy for Element.addEventListener
    */
-  @bind
   addEventListener<E extends EventName>(
     event: E,
     listener: EventListener<E>['listener'],
@@ -149,7 +153,6 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   /**
    * Proxy for Element.removeEventListener
    */
-  @bind
   removeEventListener<E extends EventName>(
     event: E,
     listener: EventListener<E>['listener']
@@ -172,7 +175,6 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   /**
    * Attach all event listeners to the underlying element
    */
-  @bind
   attachEventListeners(item = this.item) {
     if (!item) {
       return
@@ -194,7 +196,6 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   /**
    * Detach all event listeners from the underlying element
    */
-  @bind
   detachEventListeners(item = this.item) {
     if (!item) {
       return
@@ -215,7 +216,6 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   /**
    * Refreshes the attached element
    */
-  @bind
   refresh() {
     const current = this.item
     const selected =
@@ -225,7 +225,7 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
       this.detachEventListeners(current)
       this.attachEventListeners(selected)
 
-      this.item = selected
+      this._item = selected
       this.events.update.forEach(callback =>
         (callback as InternalEventListenerMap<this, T>['update'])(
           selected,
@@ -239,26 +239,6 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
     } else {
       this.detachDelegatedEventListeners()
     }
-  }
-
-  /**
-   * Proxy for array index access, and array method access
-   */
-  get(
-    target: LiveElement<T>,
-    prop: keyof HTMLElement | keyof typeof this,
-    receiver: any
-  ): any {
-    if (HTMLElement.prototype.hasOwnProperty(prop)) {
-      const property = HTMLElement.prototype[prop as keyof HTMLElement]
-      if (typeof property === 'function') {
-        return property.bind(target.item)
-      }
-
-      return target.item ? target.item[prop as keyof HTMLElement] : undefined
-    }
-
-    return target[prop as keyof typeof target]
   }
 
   /*====================================================================
@@ -336,7 +316,7 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   }
 
   get innerText(): string {
-    if (!this.item || !(this.item instanceof HTMLElement)) {
+    if (!this.item || !(this.item instanceof Element)) {
       return ''
     }
 
@@ -344,7 +324,7 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   }
 
   set innerText(value: string) {
-    if (this.item && this.item instanceof HTMLElement) {
+    if (this.item && this.item instanceof Element) {
       this.item.innerText = value
     }
   }
@@ -603,10 +583,7 @@ export default class LiveElement<T extends HTMLElement = HTMLElement>
   }
 
   querySelectorAll(selector: string): NodeListOf<Element> {
-    return (
-      this.item?.querySelectorAll(selector) ||
-      (new NodeList() as NodeListOf<Element>)
-    )
+    return this.item?.querySelectorAll(selector)!
   }
 
   remove(): void {

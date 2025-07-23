@@ -1,4 +1,3 @@
-import { bind } from 'decko'
 import LiveElement from './live-element.js'
 import Observable from './observable.js'
 import {
@@ -9,6 +8,8 @@ import {
   ObservableInterface,
   Parent,
 } from './types.js'
+
+type InheritedProperties = 'length'
 
 type InheritedMethods =
   | 'every'
@@ -25,23 +26,39 @@ type InheritedMethods =
   | 'slice'
   | 'some'
 
-interface LiveNodeListInterface<T extends HTMLElement>
-  extends Iterable<T>,
-    ArrayLike<T>,
-    Pick<Array<T>, InheritedMethods> {}
+interface LiveNodeListInterface<T extends HTMLElement = HTMLElement>
+  extends ObservableInterface,
+    Iterable<T>,
+    Pick<Array<T>, InheritedProperties & InheritedMethods> {}
 
 export default class LiveNodeList<T extends HTMLElement = HTMLElement>
   extends Observable<T>
-  implements ObservableInterface, LiveNodeListInterface<T> {
+  implements LiveNodeListInterface<T> {
   /**
    * The list of elements
    */
-  protected items: T[] = [];
+  private _items: T[] = []
 
   /**
-   * Array index access
+   * Read-only accessor for _items
    */
-  [n: number]: T
+  get items(): T[] {
+    return this._items
+  }
+
+  /**
+   * Proxy for array length
+   */
+  get length() {
+    return this.items.length
+  }
+
+  /**
+   * Proxy for array iteration
+   */
+  [Symbol.iterator](): IterableIterator<T> {
+    return this.items[Symbol.iterator]()
+  }
 
   /**
    * Accessor to determine if LiveElement is populated
@@ -55,28 +72,27 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
    */
   constructor(
     selector: string,
-    parent: Parent | LiveElement = document.documentElement,
+    parent: Parent | LiveElement = typeof document !== 'undefined'
+      ? document.documentElement
+      : (undefined as any),
     config: Config = {}
   ) {
     super(selector, parent, config)
 
     if (this.parent) {
-      this.items = Array.from(
+      this._items = Array.from(
         this.parent.querySelectorAll(this.selector) as NodeListOf<T>
       )
     } else {
-      this.items = []
+      this._items = []
     }
 
     this.registerDOMObserver()
-
-    return new Proxy<LiveNodeList<T>>(this, this)
   }
 
   /**
    * Proxy for Element.addEventListener
    */
-  @bind
   addEventListener<E extends EventName>(
     event: E,
     listener: EventListener<E>['listener'],
@@ -98,7 +114,6 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
   /**
    * Proxy for Element.removeEventListener
    */
-  @bind
   removeEventListener<E extends EventName>(
     event: E,
     listener: EventListener<E>['listener']
@@ -118,7 +133,6 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
   /**
    * Attach all event listeners to a list of items (or all items by default)
    */
-  @bind
   attachEventListeners(items = this.items) {
     ;(Object.keys(this.eventListeners) as EventName[]).forEach(event => {
       this.eventListeners[event]?.forEach(({ listener, options }) => {
@@ -138,7 +152,6 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
   /**
    * Detach all event listeners from a list of items (or all items by default)
    */
-  @bind
   detachEventListeners(items = this.items) {
     ;(Object.keys(this.eventListeners) as EventName[]).forEach(event => {
       this.eventListeners[event]?.forEach(({ listener }) => {
@@ -162,7 +175,6 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
   /**
    * Refreshes the list of attached elements
    */
-  @bind
   refresh() {
     const current = this.items as T[]
     const selected = Array.from(
@@ -176,7 +188,7 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
       this.detachEventListeners(oldItems)
       this.attachEventListeners(newItems)
 
-      this.items = selected
+      this._items = selected
 
       this.pause()
       this.events.update.forEach(
@@ -198,49 +210,7 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
    * in NodeList b
    */
   diffNodeList(a: T[], b: T[]): T[] {
-    return Array.prototype.filter.call(
-      a,
-      item => !Array.prototype.includes.call(b, item)
-    ) as T[]
-  }
-
-  /**
-   * Proxy for array length
-   */
-  get length() {
-    return this.items.length
-  }
-
-  /**
-   * Proxy for array index access, and array method access
-   */
-  get(target: LiveNodeList<T>, prop: number, receiver: any): T
-  get(target: LiveNodeList<T>, prop: string | symbol, receiver: any): any
-  get(
-    target: LiveNodeList<T>,
-    prop: keyof Array<T> | keyof typeof this | number | string | symbol,
-    receiver: any
-  ): T | any {
-    if (typeof prop === 'number') {
-      return target.items[prop]
-    }
-
-    if (Array.prototype.hasOwnProperty(prop)) {
-      if (typeof Array.prototype[prop as keyof Array<T>] === 'function') {
-        return Array.prototype[prop as keyof Array<T>].bind(this.items)
-      }
-
-      return this.items[prop as keyof Array<T>]
-    }
-
-    return this[prop as keyof typeof this]
-  }
-
-  /**
-   * Proxy for array iteration
-   */
-  [Symbol.iterator](): IterableIterator<T> {
-    return this.items[Symbol.iterator]()
+    return a.filter((item: T) => !b.includes(item))
   }
 
   /**======================================================================
@@ -250,114 +220,79 @@ export default class LiveNodeList<T extends HTMLElement = HTMLElement>
    * so that the contents always reflect the DOM.
    *
    ======================================================================*/
-  every<T>(
-    predicate: (value: T, index: number, array: T[]) => value is T,
+  every(
+    predicate: (value: T, index: number, array: T[]) => boolean,
     thisArg?: any
-  ): this is T[] {
-    return Array.prototype.every.call(this.items, predicate, thisArg)
+  ): boolean {
+    return this.items.every(predicate, thisArg)
   }
 
   filter(
-    predicate: (value: T, index: number, array: T[]) => unknown,
+    callback: (value: T, index: number, array: T[]) => boolean,
     thisArg?: any
-  ): T[] {
-    return Array.prototype.filter.call(this.items, predicate, thisArg)
+  ) {
+    return this.items.filter(callback, thisArg)
   }
 
   find(
-    predicate: (value: T, index: number, obj: T[]) => unknown,
+    callback: (value: T, index: number, array: T[]) => boolean,
     thisArg?: any
-  ): T | undefined {
-    return Array.prototype.find.call(this.items, predicate, thisArg)
+  ) {
+    return this.items.find(callback, thisArg)
   }
 
   findIndex(
-    predicate: (value: T, index: number, obj: T[]) => unknown,
+    callback: (value: T, index: number, array: T[]) => boolean,
     thisArg?: any
-  ): number {
-    return Array.prototype.findIndex.call(this.items, predicate, thisArg)
+  ) {
+    return this.items.findIndex(callback, thisArg)
   }
 
   forEach(
-    callbackfn: (value: T, index: number, array: T[]) => void,
+    callback: (value: T, index: number, array: T[]) => void,
     thisArg?: any
-  ): void {
-    Array.prototype.forEach.call(this.items, callbackfn, thisArg)
+  ) {
+    return this.items.forEach(callback, thisArg)
   }
 
-  includes(searchElement: T, fromIndex?: number): boolean {
-    return Array.prototype.includes.call(this.items, searchElement, fromIndex)
+  includes(value: T, fromIndex?: number) {
+    return this.items.includes(value, fromIndex)
   }
 
-  indexOf(searchElement: T, fromIndex?: number): number {
-    return Array.prototype.indexOf.call(this.items, searchElement, fromIndex)
+  indexOf(value: T, fromIndex?: number) {
+    return this.items.indexOf(value, fromIndex)
   }
 
-  lastIndexOf(searchElement: T, fromIndex?: number): number {
-    return Array.prototype.lastIndexOf.call(
-      this.items,
-      searchElement,
-      fromIndex
-    )
+  lastIndexOf(value: T, fromIndex?: number) {
+    return this.items.lastIndexOf(value, fromIndex)
   }
 
-  map<U>(
-    callbackfn: (value: T, index: number, array: T[]) => U,
-    thisArg?: any
-  ): U[] {
-    return Array.prototype.map.call(this.items, callbackfn, thisArg) as U[]
+  map(callback: (value: T, index: number, array: T[]) => any, thisArg?: any) {
+    return this.items.map(callback, thisArg)
   }
 
-  reduce<U>(
-    callbackfn: (
-      previousValue: U,
-      currentValue: T,
-      currentIndex: number,
-      array: T[]
-    ) => U,
-    initialValue?: U
-  ): U {
-    return Array.prototype.reduce.call(
-      this.items,
-      callbackfn as (
-        previousValue: unknown,
-        currentValue: T,
-        currentIndex: number,
-        array: T[]
-      ) => U,
-      initialValue
-    ) as U
+  reduce(
+    callback: (accumulator: any, value: T, index: number, array: T[]) => any,
+    initialValue?: any
+  ) {
+    return this.items.reduce(callback, initialValue)
   }
 
-  reduceRight<U>(
-    callbackfn: (
-      previousValue: U,
-      currentValue: T,
-      currentIndex: number,
-      array: T[]
-    ) => U,
-    initialValue?: U
-  ): U {
-    return Array.prototype.reduceRight.call(
-      this.items,
-      callbackfn as (
-        previousValue: unknown,
-        currentValue: T,
-        currentIndex: number,
-        array: T[]
-      ) => U,
-      initialValue
-    ) as U
+  reduceRight(
+    callback: (accumulator: any, value: T, index: number, array: T[]) => any,
+    initialValue?: any
+  ) {
+    return this.items.reduceRight(callback, initialValue)
   }
 
-  slice(start?: number, end?: number): T[] {
-    return Array.prototype.slice.call(this.items, start, end)
+  slice(start?: number, end?: number) {
+    return this.items.slice(start, end)
   }
 
   some(
-    predicate: (value: T, index: number, array: T[]) => unknown,
+    callback: (value: T, index: number, array: T[]) => boolean,
     thisArg?: any
-  ): boolean {
-    return Array.prototype.some.call(this.items, predicate, thisArg)
+  ) {
+    return this.items.some(callback, thisArg)
   }
 }
