@@ -51,8 +51,8 @@ jobs:
 
 </details>'
 
-      - name: Check for pa11y failures.
+      - name: Check for test failures.
         if: contains(steps.test_output.outputs.content, 'errno 2')
         run: |
-          echo "::error::The site is failing tests. Please review the comment in the pull request or the Jest step in the workflow for details."
+          echo "::error::The package is failing tests. Please review the comment in the pull request or the Jest step in the workflow for details."
           exit 1
