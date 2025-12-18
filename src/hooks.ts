@@ -8,7 +8,7 @@ export const useLiveElement = <T extends HTMLElement>(
   parent?: Parent | LiveElement,
   options?: Config
 ): LiveElement<T> | undefined => {
-  const list = useRef<LiveElement<T>>()
+  const list = useRef<LiveElement<T>>(undefined)
 
   useEffect(() => {
     if (list.current) {
@@ -32,7 +32,7 @@ export const useLiveNodeList = <T extends HTMLElement>(
   parent?: Parent | LiveElement,
   options?: Config
 ): LiveNodeList<T> | undefined => {
-  const list = useRef<LiveNodeList<T>>()
+  const list = useRef<LiveNodeList<T>>(undefined)
 
   useEffect(() => {
     if (list.current) {
