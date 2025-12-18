@@ -237,3 +237,17 @@ const list = useLiveNodeList('.selector', el.current)
 
 list.addEventListener('click', () => {})
 ```
+
+## Contributing
+
+All contributions are welcome, and encouraged. Please read our [contribution guidelines](CONTRIBUTING.md) and [code of conduct](CODE-OF-CONDUCT.md) for more information.
+
+## License
+
+Copyright &copy; [James Dinsdale](https://molovo.co) <hi@molovo.co>
+
+LiveNodeList is licensed under [The MIT License (MIT)](./LICENSE)
+
+## Team
+
+- [James Dinsdale](http://molovo.co)
