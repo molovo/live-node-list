@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import LiveElement from './live-element.js'
 import LiveNodeList from './live-node-list.js'
 import { Config, Parent } from './types.js'
@@ -8,23 +8,26 @@ export const useLiveElement = <T extends HTMLElement>(
   parent?: Parent | LiveElement,
   options?: Config
 ): LiveElement<T> | undefined => {
-  const list = useRef<LiveElement<T>>(undefined)
+  const [list, setList] = useState<LiveElement<T> | undefined>(undefined)
 
   useEffect(() => {
-    if (list.current) {
-      list.current.destroy()
+    // If old record exists, destroy it
+    if (list) {
+      list.destroy()
     }
 
-    list.current = new LiveElement<T>(selector, parent, options)
+    const liveElement = new LiveElement<T>(selector, parent, options)
+    setList(liveElement)
 
     return () => {
-      if (list.current) {
-        list.current.destroy()
+      if (list) {
+        list.destroy()
+        setList(undefined)
       }
     }
   }, [selector, parent, options])
 
-  return list.current
+  return list
 }
 
 export const useLiveNodeList = <T extends HTMLElement>(
@@ -32,21 +35,24 @@ export const useLiveNodeList = <T extends HTMLElement>(
   parent?: Parent | LiveElement,
   options?: Config
 ): LiveNodeList<T> | undefined => {
-  const list = useRef<LiveNodeList<T>>(undefined)
+  const [list, setList] = useState<LiveNodeList<T> | undefined>(undefined)
 
   useEffect(() => {
-    if (list.current) {
-      list.current.destroy()
+    // If old record exists, destroy it
+    if (list) {
+      list.destroy()
     }
 
-    list.current = new LiveNodeList<T>(selector, parent, options)
+    const liveNodeList = new LiveNodeList<T>(selector, parent, options)
+    setList(liveNodeList)
 
     return () => {
-      if (list.current) {
-        list.current.destroy()
+      if (list) {
+        list.destroy()
+        setList(undefined)
       }
     }
   }, [selector, parent, options])
 
-  return list.current
+  return list
 }
